@@ -32,6 +32,18 @@ export interface BatchFile {
   transactions: BatchTransaction[]
 }
 
+export interface TxWithMeta {
+  pubkey: string
+  withdrawal_credentials: string
+  amount: number
+  signature: string
+  deposit_message_root: string
+  deposit_data_root: string
+  fork_version: string
+  network_name: string
+  deposit_cli_version: string
+}
+
 export interface BatchFileMeta {
   txBuilderVersion?: string
   checksum?: string
