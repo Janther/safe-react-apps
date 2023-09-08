@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "yarn workspaces run build",
+    "build:tx-builder": "yarn workspace tx-builder build",
     "test": "yarn workspaces run test --watchAll=false",
     "test:coverage": "yarn workspaces run test --coverage --watchAll=false",
     "deploy:pr": "yarn workspaces run deploy:pr",
