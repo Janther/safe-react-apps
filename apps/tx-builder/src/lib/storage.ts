@@ -1,5 +1,5 @@
 import localforage from 'localforage'
-import { BatchFile, TxWithMeta } from '../typings/models'
+import { BatchFile, BatchTransaction, TxWithMeta } from '../typings/models'
 import { trackSafeAppEvent } from './analytics'
 import { stringifyReplacer } from './checksum'
 
@@ -141,7 +141,10 @@ const transactionMetaTemplate: {
   contractInputsValues: {},
 }
 
-const importFile = async (file: File): Promise<BatchFile | undefined> => {
+const importFile = async (
+  file: File,
+  generateBatch: (name: string, transactions: BatchTransaction[]) => BatchFile,
+): Promise<BatchFile | undefined> => {
   return new Promise(resolve => {
     const reader = new FileReader()
     reader.readAsText(file)
@@ -183,20 +186,7 @@ const importFile = async (file: File): Promise<BatchFile | undefined> => {
               contractInputsValues: values,
             }
           })
-        resolve({
-          version: '1.0.0',
-          chainId: '5',
-          createdAt: new Date().getTime(),
-          meta: {
-            name: 'Transactions Batch',
-            description: '',
-            txBuilderVersion: '1.14.1',
-            createdFromSafeAddress: '0x4f3e63c1B60B88eEEc2BA7551C502b0a07D857Ed',
-            createdFromOwnerAddress: '',
-            checksum: '0xdd47b3aa6161df4e15737f90f5a2c59c70abeaabcd1a7ff795697edefcdbe85a',
-          },
-          transactions,
-        })
+        resolve(generateBatch('Transactions Batch', transactions))
 
         trackSafeAppEvent('Import batch')
         return

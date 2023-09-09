@@ -219,7 +219,7 @@ const TransactionLibraryProvider: React.FC = ({ children }) => {
 
   const importBatch: TransactionLibraryContextProps['importBatch'] = useCallback(
     async file => {
-      const importedFile = await StorageManager.importFile(file)
+      const importedFile = await StorageManager.importFile(file, generateBatch(chainInfo, safe))
       if (importedFile) {
         const batchFile = initializeBatch(importedFile)
         return batchFile
@@ -229,8 +229,26 @@ const TransactionLibraryProvider: React.FC = ({ children }) => {
       const batches = await loadBatches(chainInfo)
       setBatches(batches)
     },
-    [initializeBatch, chainInfo],
+    [initializeBatch, chainInfo, safe],
   )
+
+  const generateBatch =
+    (chainInfo: ChainInfo | undefined, safe: SafeInfo) =>
+    (name: string, transactions: BatchTransaction[]): BatchFile => {
+      return addChecksum({
+        version: '1.0',
+        chainId: chainInfo?.chainId || '',
+        createdAt: Date.now(),
+        meta: {
+          name,
+          description: '',
+          txBuilderVersion: packageJson.version,
+          createdFromSafeAddress: safe.safeAddress,
+          createdFromOwnerAddress: '',
+        },
+        transactions,
+      })
+    }
 
   return (
     <TransactionLibraryContext.Provider
